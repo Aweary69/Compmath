@@ -1,21 +1,33 @@
 function newtonsForwardDifference(x, y, targetX) {
     const n = x.length;
-    let diffTable = Array.from({ length: n }, () => Array(n).fill(0));
-
-    // Fill first column with y values
-    for (let i = 0; i < n; i++) {
-        diffTable[i][0] = y[i];
+    if (n < 2) {
+        return "Not enough data points for derivative approximation."; // Handle case with insufficient points
     }
 
-    // Compute forward difference table
-    for (let j = 1; j < n; j++) {
-        for (let i = 0; i < n - j; i++) {
-            diffTable[i][j] = (diffTable[i + 1][j - 1] - diffTable[i][j - 1]) / (x[i + j] - x[i]);
+    // 1. Find index of x value closest to targetX
+    let closestIndex = 0;
+    let minDifference = Math.abs(x[0] - targetX);
+
+    for (let i = 1; i < n; i++) {
+        const difference = Math.abs(x[i] - targetX);
+        if (difference < minDifference) {
+            minDifference = difference;
+            closestIndex = i;
         }
     }
 
-    // First derivative approximation at targetX
-    let derivative = diffTable[0][1];
+    // 2. Calculate forward difference using closest point and the next one (if available)
+    let derivative;
+    if (closestIndex < n - 1) {
+        // Use forward difference: (f(x_{i+1}) - f(x_i)) / (x_{i+1} - x_i)
+        derivative = (y[closestIndex + 1] - y[closestIndex]) / (x[closestIndex + 1] - x[closestIndex]);
+    } else if (closestIndex > 0) {
+        // If closestIndex is the last point, use backward difference: (f(x_i) - f(x_{i-1})) / (x_i - x_{i-1})
+        derivative = (y[closestIndex] - y[closestIndex - 1]) / (x[closestIndex] - x[closestIndex - 1]);
+    } else {
+        return "Cannot calculate derivative at this targetX with given data."; // Should not happen in typical cases, but for robustness
+    }
+
     return derivative;
 }
 

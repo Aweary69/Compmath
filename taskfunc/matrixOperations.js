@@ -1,73 +1,96 @@
-function matrixTrace(A) {
-    return A.reduce((sum, row, i) => sum + row[i], 0);
-}
-
-function identityMatrix(n) {
-    return Array.from({ length: n }, (_, i) =>
-        Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
-    );
-}
+// Helper Functions for Matrix Operations
 
 function multiplyMatrices(A, B) {
-    let result = A.map(row => Array(B[0].length).fill(0));
-    for (let i = 0; i < A.length; i++) {
-        for (let j = 0; j < B[0].length; j++) {
-            for (let k = 0; k < A[0].length; k++) {
-                result[i][j] += A[i][k] * B[k][j];
+    const rowsA = A.length;
+    const colsA = A[0].length;
+    const colsB = B[0].length;
+    if (colsA !== B.length) {
+        throw new Error("Matrices can't be multiplied: Incompatible dimensions.");
+    }
+
+    let result = Array(rowsA).fill(null).map(() => Array(colsB).fill(0));
+
+    for (let i = 0; i < rowsA; i++) {
+        for (let j = 0; j < colsB; j++) {
+            let sum = 0;
+            for (let k = 0; k < colsA; k++) {
+                sum += A[i][k] * B[k][j];
             }
+            result[i][j] = sum;
         }
     }
-    return result.map(row => row.map(val => Number(val.toFixed(10))));
+    return result;
+}
+
+function scalarMultiplyMatrix(scalar, A) {
+    const rowsA = A.length;
+    const colsA = A[0].length;
+    let result = Array(rowsA).fill(null).map(() => Array(colsA).fill(0));
+    for (let i = 0; i < rowsA; i++) {
+        for (let j = 0; j < colsA; j++) {
+            result[i][j] = scalar * A[i][j];
+        }
+    }
+    return result;
 }
 
 function subtractMatrices(A, B) {
-    return A.map((row, i) => row.map((val, j) => Number((val - B[i][j]).toFixed(10))));
-}
-
-function addMatrices(A, B) {
-    return A.map((row, i) => row.map((val, j) => Number((val + B[i][j]).toFixed(10))));
-}
-
-function scaleMatrix(A, scalar) {
-    return A.map(row => row.map(val => Number((val * scalar).toFixed(10))));
-}
-
-function matrixNorm(A) {
-    return Math.sqrt(A.flat().reduce((sum, val) => sum + val * val, 0));
-}
-
-function isSingular(A) {
-    // Determinant check (only works for 3x3)
-    let det = A[0][0] * (A[1][1] * A[2][2] - A[1][2] * A[2][1]) -
-              A[0][1] * (A[1][0] * A[2][2] - A[1][2] * A[2][0]) +
-              A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0]);
-    return Math.abs(det) < 1e-8;
-}
-
-function iterativeMatrixInverse(A, tol = 1e-8, maxIter = 500) {
-    const n = A.length;
-    const I = identityMatrix(n);
-    
-    if (isSingular(A)) {
-        throw new Error("Matrix is singular or nearly singular, cannot compute inverse.");
+    const rowsA = A.length;
+    const colsA = A[0].length;
+    if (rowsA !== B.length || colsA !== B[0].length) {
+        throw new Error("Matrices can't be subtracted: Incompatible dimensions.");
     }
-
-    const traceA = matrixTrace(A);
-    if (traceA === 0) throw new Error("Trace is zero, cannot use this method.");
-    
-    let B = scaleMatrix(I, 1 / traceA); // Initial guess based on trace
-
-    for (let iter = 0; iter < maxIter; iter++) {
-        let E = subtractMatrices(I, multiplyMatrices(A, B)); // Compute error
-        let B_new = multiplyMatrices(B, addMatrices(I, scaleMatrix(E, 0.5))); // Damped Newton-Schulz
-
-        if (matrixNorm(E) < tol) {
-            return B_new;
+    let result = Array(rowsA).fill(null).map(() => Array(colsA).fill(0));
+    for (let i = 0; i < rowsA; i++) {
+        for (let j = 0; j < colsA; j++) {
+            result[i][j] = A[i][j] - B[i][j];
         }
-        B = B_new;
     }
-
-    return B;
+    return result;
 }
 
-module.exports = { iterativeMatrixInverse };
+function identityMatrix(size) {
+    let result = Array(size).fill(null).map(() => Array(size).fill(0));
+    for (let i = 0; i < size; i++) {
+        result[i][i] = 1;
+    }
+    return result;
+}
+
+function trace(A) {
+    let tr = 0;
+    for (let i = 0; i < A.length; i++) {
+        tr += A[i][i];
+    }
+    return tr;
+}
+
+
+// Iterative Matrix Inverse using Schulz Iteration
+function iterativeMatrixInverse(A, iterations = 10) { // Default to 10 iterations, can be adjusted
+    const size = A.length;
+
+    if (size !== A[0].length) {
+        throw new Error("Matrix must be square for inversion.");
+    }
+
+    // Initial guess based on trace
+    const initialGuessScalar = 1 / trace(A);
+    let X = scalarMultiplyMatrix(initialGuessScalar, identityMatrix(size));
+
+
+    for (let k = 0; k < iterations; k++) {
+        const AX = multiplyMatrices(A, X);
+        const I_minus_AX = subtractMatrices(identityMatrix(size), AX);
+        const termToAdd = scalarMultiplyMatrix(2, identityMatrix(size)); // Create 2I
+        const termToAdd_minus_AX = subtractMatrices(termToAdd, AX); // 2I - AX
+        const X_next = multiplyMatrices(X, termToAdd_minus_AX); // X_k * (2I - AX_k)
+
+        X = X_next; // Update X for the next iteration
+    }
+
+    return X;
+}
+
+
+module.exports = { iterativeMatrixInverse, linearLeastSquaresFit: null, newtonsForwardDifference: null }; // Export iterativeMatrixInverse and keep others as null for now.
