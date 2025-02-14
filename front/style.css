@@ -1,0 +1,143 @@
+/* Vercel-Inspired Dark Mode Style */
+
+/* Font and Basic Reset */
+body {
+    font-family: 'Inter', sans-serif; /* Use Inter font, or fallback */
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 20px;
+    background-color: #121212; /* Very dark gray/almost black background - typical dark mode */
+    color: #f0f0f0; /* Light gray/off-white text for dark mode */
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff; /* White headings */
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+
+p {
+    margin-bottom: 1em;
+    color: #d0d0d0; /* Slightly darker light gray for paragraphs */
+}
+
+/* Layout and Sections */
+.container {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.method-section {
+    background-color: #1e1e1e; /* Darker section background */
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for dark mode - adjust opacity */
+    border: 1px solid #333; /* Darker border for sections */
+}
+
+.hidden-section {
+    display: none;
+}
+
+/* Form Elements */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #eee; /* Light gray labels */
+}
+
+input[type="number"],
+textarea,
+select {
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #555; /* Darker border for inputs */
+    border-radius: 8px;
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    background-color: #2b2b2b; /* Dark input background */
+    color: #f0f0f0; /* Light text in inputs */
+}
+
+select {
+    cursor: pointer;
+    background-color: #2b2b2b; /* Ensure consistent background */
+}
+
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background-color: #2979FF; /* Keep the blue accent color for buttons */
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); /* Darker shadow for buttons in dark mode */
+}
+
+button:hover {
+    background-color: #1e60da;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.5); /* Darker hover shadow */
+}
+
+button:active {
+    background-color: #1547a3;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); /* Even darker active shadow */
+}
+
+/* Table Styling */
+table {
+    border-collapse: collapse;
+    margin: 20px 0;
+    width: 100%;
+    border-spacing: 0;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #555; /* Darker table border */
+    color: #f0f0f0; /* Light table text */
+}
+
+th {
+    background-color: #333; /* Darker header background */
+    font-weight: 600;
+    color: #fff; /* White header text */
+}
+
+/* Result Area Styling */
+#inverseResultArea,
+#curveFitResultArea,
+#derivativeResultArea {
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid #555; /* Darker result area border */
+    border-radius: 8px;
+    background-color: #2b2b2b; /* Dark result area background */
+    font-family: 'Menlo', monospace;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    color: #f0f0f0; /* Light result text */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4); /* Inset shadow for dark mode */
+}
+
+.validation-error {
+    color: red; /* Make error messages red */
+    font-size: 0.85em; /* Smaller font size */
+    margin-left: 5px; /* Add a little space */
+    display: block; /* Ensure it's on a new line if needed */
+}

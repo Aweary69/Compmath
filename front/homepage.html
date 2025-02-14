@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computational Toolkit</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Interactive Computational Toolkit</h1>
+
+    <label for="methodSelector">Choose a Calculation:</label>
+    <select id="methodSelector" onchange="showCalculationSection()">
+        <option value="">-- Select a Method --</option>
+        <option value="graphicalRoot">Graphical Root Finding</option>
+        <option value="comparisonRootMethods">Comparison of Root-Finding Methods</option>
+        <option value="jacobiMethod">Jacobi Method: Solving a System of Equations</option>
+        <option value="matrixInverse">Matrix Inversion</option>
+        <option value="curveFitting">Linear Curve Fitting</option>
+        <option value="firstDerivative">First Derivative (Newton's Forward Difference)</option>
+        <option value="taylorSeries">Taylor Series Approximation</option>
+        <option value="simpsons38">Simpson’s 3/8 Rule Integration</option>
+    </select>
+
+    <div id="matrixSection" class="method-section hidden-section" data-method="matrixInverse">
+        <h2>Matrix Inversion Operation</h2>
+        <p>Specify Matrix Dimensions (up to 5x5 for simplicity):</p>
+        <label for="matrixRows">Rows:</label>
+        <input type="number" id="matrixRows" value="3" min="1" max="5">
+        <label for="matrixCols">Columns:</label>
+        <input type="number" id="matrixCols" value="3" min="1" max="5">
+        <button onclick="generateMatrixInputFields()">Generate Matrix Input</button>
+        <div id="matrixInputAreaContainer"></div>
+        <button onclick="initiateInverseComputation()">Compute Inverse</button>
+        <h3>Resulting Inverse Matrix:</h3>
+        <div id="inverseResultArea"></div>
+    </div>
+
+    <div id="curveFitSection" class="method-section hidden-section" data-method="curveFitting">
+        <h2>Linear Curve Fitting Analysis</h2>
+        <p>Enter data points for curve fitting (format: x,y x,y x,y):</p>
+        <textarea id="pointsInputArea" placeholder="e.g., 1,5 2,8 3,12"></textarea>
+        <button onclick="commenceCurveFitting()">Compute Fit</button>
+        <h3>Best-Fit Line Equation:</h3>
+        <pre id="curveFitResultArea"></pre>
+    </div>
+
+    <div id="derivativeSection" class="method-section hidden-section" data-method="firstDerivative">
+        <h2>Newton's Forward Difference Derivative Calculation</h2>
+        <p>Provide x values (comma-separated):</p>
+        <textarea id="xValuesInput" placeholder="e.g., 1.0, 1.2, 1.4, 1.6"></textarea>
+        <p>Provide corresponding y values (comma-separated):</p>
+        <textarea id="yValuesInput" placeholder="e.g., 0, 0.128, 0.544, 1.296"></textarea>
+        <p>Enter the target x value for derivative estimation:</p>
+        <input type="number" id="targetXValue" placeholder="Target x">
+        <button onclick="calculateDerivativeValue()">Compute Derivative</button>
+        <h3>Estimated Derivative Value:</h3>
+        <pre id="derivativeResultArea"></pre>
+    </div>
+
+    <div id="graphicalRootSection" class="method-section hidden-section" data-method="graphicalRoot">
+        <h2>Graphical Root Finding (f(x) = cos(x) - x)</h2>
+        <canvas id="functionPlotCanvas" width="400" height="300"></canvas> <br>
+        <p>
+            Approximate Root (from graph):
+            <input type="number" id="graphicalRootApprox" value="0.74" step="0.01">
+        </p>
+
+        <p>Interval [a, b] for Bisection Method:</p>
+        <label for="bisectionA">a:</label> <input type="number" id="bisectionA" value="0">
+        <label for="bisectionB">b:</label> <input type="number" id="bisectionB" value="1">
+        <label for="bisectionTolerance">Tolerance:</label> <input type="number" id="bisectionTolerance" value="0.0001">
+        <label for="bisectionMaxIter">Max Iterations:</label> <input type="number" id="bisectionMaxIter" value="100">
+        <button onclick="computeNumericalRoot()">Compute Numerical Root</button> <br>
+        <p>Numerical Root (Bisection): <span id="numericalRootResult"></span></p>
+
+        <p>Absolute Error: <span id="graphicalRootError"></span></p>
+    </div>
+
+    <div id="comparisonRootFindingSection" class="method-section hidden-section" data-method="comparisonRootMethods">
+        <h2>Comparison of Root-Finding Methods (f(x) = x² - 4sin(x))</h2>
+        <p>Function: f(x) = x² - 4sin(x), Interval: [0, 3]</p>
+    
+        <h3>False Position Method</h3>
+        <p>Interval [a, b]:</p>
+        <label for="falsePositionA">a:</label> <input type="number" id="falsePositionA" value="0">
+        <label for="falsePositionB">b:</label> <input type="number" id="falsePositionB" value="3">
+        <label for="falsePositionTolerance">Tolerance:</label> <input type="number" id="falsePositionTolerance" value="0.0001">
+        <label for="falsePositionMaxIter">Max Iterations:</label> <input type="number" id="falsePositionMaxIter" value="100">
+        <button onclick="computeFalsePositionRoot()">Compute Root (False Position)</button> 
+        <p>Root: <span id="falsePositionRootResult"></span>, Iterations: <span id="falsePositionIterations"></span>, Relative Error: <span id="falsePositionRelativeError"></span></p>
+    
+        <h3>Newton-Raphson Method</h3>
+        <p>Initial Guess (x₀):</p>
+        <label for="newtonRaphsonInitialGuess">x₀:</label> <input type="number" id="newtonRaphsonInitialGuess" value="0.5">
+        <label for="newtonRaphsonTolerance">Tolerance:</label> <input type="number" id="newtonRaphsonTolerance" value="0.0001">
+        <label for="newtonRaphsonMaxIter">Max Iterations:</label> <input type="number" id="newtonRaphsonMaxIter" value="100">
+        <button onclick="computeNewtonRaphsonRoot()">Compute Root (Newton-Raphson)</button>
+        <p>Root: <span id="newtonRaphsonRootResult"></span>, Iterations: <span id="newtonRaphsonIterations"></span>, Relative Error: <span id="newtonRaphsonRelativeError"></span></p>
+    
+        <h3>Comparison</h3>
+        <table border="1">
+            <tr>
+                <th>Method</th>
+                <th>Root</th>
+                <th>Iterations</th>
+                <th>Relative Error</th>
+            </tr>
+            <tr>
+                <td>False Position</td>
+                <td id="compFalsePositionRoot"></td>
+                <td id="compFalsePositionIter"></td>
+                <td id="compFalsePositionError"></td>
+            </tr>
+            <tr>
+                <td>Newton-Raphson</td>
+                <td id="compNewtonRaphsonRoot"></td>
+                <td id="compNewtonRaphsonIter"></td>
+                <td id="compNewtonRaphsonError"></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div id="jacobiSection" class="method-section hidden-section" data-method="jacobiMethod">
+        <h2>Jacobi Method: Solving a System of Equations</h2>
+        <p>System of Equations:</p>
+        <pre>
+            3x + y - z = 1
+            2x - 8y + z = -2
+            -x + y + 5z = 3
+        </pre>
+    
+        <p>Enter tolerance:</p>
+        <input type="number" id="jacobiTolerance" placeholder="e.g., 0.0001" value="0.0001">
+        
+        <p>Enter max iterations:</p>
+        <input type="number" id="jacobiMaxIter" placeholder="e.g., 100" value="100">
+        
+        <button onclick="computeJacobiSolution()">Compute Solution</button>
+        
+        <h3>Solution:</h3>
+        <pre id="jacobiSolutionArea"></pre>
+        
+        <h3>Iterations:</h3>
+        <pre id="jacobiIterations"></pre>
+        
+        <h3>Relative Error:</h3>
+        <pre id="jacobiRelativeError"></pre>
+    </div>
+
+    <div id="taylorSeriesSection" class="method-section hidden-section" data-method="taylorSeries">
+        <h2>Taylor Series Approximation (dy/dx = y² + x², y(0) = 1)</h2>
+        
+        <p>
+            Compute y(x) using Taylor Series:
+            <label for="taylorInputX">x:</label>
+            <input type="number" id="taylorInputX" value="0.1" step="0.01">
+            <button onclick="computeTaylorSeries()">Compute</button>
+        </p>
+    
+        <p>Approximate y(x): <span id="taylorResult"></span></p>
+    </div>
+
+    <div id="simpsons38Section" class="method-section hidden-section" data-method="simpsons38">
+        <h2>Simpson’s 3/8 Rule Integration (∫ x³ dx from 2 to 5)</h2>
+    
+        <p>
+            Compute Integral using Simpson’s 3/8 Rule:
+            <button onclick="computeSimpsons38()">Compute</button>
+        </p>
+    
+        <p>Approximate Integral Value: <span id="simpson_approx_value"></span></p>
+        <p>Exact Integral Value: <span id="simpson_exact_value"></span></p>
+        <p>Absolute Error: <span id="simpson_absolute_error"></span></p>
+    </div>
+    
+
+    <script>
+        function generateMatrixInputFields() {
+            const rowsInput = document.getElementById("matrixRows");
+            const colsInput = document.getElementById("matrixCols");
+            const container = document.getElementById("matrixInputAreaContainer");
+            container.innerHTML = '';
+            resetValidationMessage("matrixRows");
+            resetValidationMessage("matrixCols");
+
+            const rows = parseInt(rowsInput.value);
+            const cols = parseInt(colsInput.value);
+
+            if (isNaN(rows) || isNaN(cols)) {
+                displayValidationMessage("matrixRows", "Rows must be a number.");
+                displayValidationMessage("matrixCols", "Columns must be a number.");
+                return;
+            }
+            if (!Number.isInteger(rows) || !Number.isInteger(cols)) {
+                displayValidationMessage("matrixRows", "Rows must be an integer.");
+                displayValidationMessage("matrixCols", "Columns must be an integer.");
+                return;
+            }
+            if (rows < 1 || rows > 5 || cols < 1 || cols > 5) {
+                displayValidationMessage("matrixRows", "Rows must be between 1 and 5.");
+                displayValidationMessage("matrixCols", "Columns must be between 1 and 5.");
+                return;
+            }
+
+            let table = document.createElement('table');
+            for (let i = 0; i < rows; i++) {
+                let row = table.insertRow();
+                for (let j = 0; j < cols; j++) {
+                    let cell = row.insertCell();
+                    let input = document.createElement('input');
+                    input.type = 'number';
+                    input.classList.add('matrix-input-cell');
+                    input.id = `matrix-input-${i}-${j}`;
+                    cell.appendChild(input);
+                }
+            }
+            container.appendChild(table);
+        }
+
+        async function initiateInverseComputation() {
+            const rows = parseInt(document.getElementById("matrixRows").value);
+            const cols = parseInt(document.getElementById("matrixCols").value);
+            let matrix = [];
+            let isValidMatrix = true;
+            for (let i = 0; i < rows; i++) {
+                let row = [];
+                for (let j = 0; j < cols; j++) {
+                    const inputElement = document.getElementById(`matrix-input-${i}-${j}`);
+                    const inputValue = parseFloat(inputElement.value);
+                    resetValidationMessage(inputElement.id);
+                    if (isNaN(inputValue)) {
+                        displayValidationMessage(inputElement.id, "Must be a number.");
+                        isValidMatrix = false;
+                    }
+                    row.push(inputValue);
+                }
+                matrix.push(row);
+            }
+
+            if (!isValidMatrix) return;
+            if (matrix.length === 0 || matrix[0].length === 0) {
+                alert("Please generate a matrix to compute the inverse.");
+                return;
+            }
+
+            const serverResponse = await fetch("/math/inverse", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ matrix })
+            });
+
+            const processedData = await serverResponse.json();
+
+            if (processedData.inverse) {
+                displayInverseMatrixAsTable(processedData.inverse);
+            } else {
+                document.getElementById("inverseResultArea").innerText = "❌ Error: " + processedData.error;
+            }
+        }
+
+        function displayInverseMatrixAsTable(inverseMatrix) {
+            const resultArea = document.getElementById("inverseResultArea");
+            resultArea.innerHTML = '';
+            if (!inverseMatrix || !Array.isArray(inverseMatrix) || inverseMatrix.length === 0) {
+                resultArea.innerText = "No inverse matrix to display.";
+                return;
+            }
+
+            let table = document.createElement('table');
+            for (const row of inverseMatrix) {
+                let tableRow = table.insertRow();
+                for (const cellValue of row) {
+                    let tableCell = tableRow.insertCell();
+                    tableCell.textContent = cellValue.toFixed(4);
+                }
+            }
+            resultArea.appendChild(table);
+        }
+
+        function showCalculationSection() {
+            const selectedMethod = document.getElementById("methodSelector").value;
+            const allSections = document.querySelectorAll('.method-section');
+            allSections.forEach(section => section.classList.add('hidden-section'));
+
+            if (selectedMethod) {
+                const selectedSection = document.querySelector(`.method-section[data-method="${selectedMethod}"]`);
+                if (selectedSection) {
+                    selectedSection.classList.remove('hidden-section');
+                    if (selectedMethod === "graphicalRoot") {
+                        plotFunctionGraph();
+                    }
+                }
+            }
+        }
+
+        async function commenceCurveFitting() {
+            const inputPointsText = document.getElementById("pointsInputArea").value;
+            resetValidationMessage("pointsInputArea");
+            const pointsData = inputPointsText.trim().split(" ").map(p => p.split(",").map(Number));
+
+            if (inputPointsText.trim() === "") {
+                displayValidationMessage("pointsInputArea", "Please enter data points.");
+                return;
+            }
+
+            for (let i = 0; i < pointsData.length; i++) {
+                const point = pointsData[i];
+                if (point.length !== 2) {
+                    displayValidationMessage("pointsInputArea", "Invalid point format at point " + (i + 1) + ". Use format: x,y x,y ...");
+                    return;
+                }
+                if (isNaN(point[0]) || isNaN(point[1])) {
+                    displayValidationMessage("pointsInputArea", "Non-numeric value in point " + (i + 1) + ". Use format: x,y x,y ...");
+                    return;
+                }
+            }
+
+            const serverResponse = await fetch("/math/curve-fit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ points: pointsData })
+            });
+
+            const analysisResult = await serverResponse.json();
+
+            if (analysisResult.error) {
+                document.getElementById("curveFitResultArea").innerText = "❌ Error: " + analysisResult.error;
+            } else {
+                document.getElementById("curveFitResultArea").innerText =
+                    `✅ Best-fit line: y = ${analysisResult.slope.toFixed(4)}x + ${analysisResult.intercept.toFixed(4)}`;
+            }
+        }
+
+        async function calculateDerivativeValue() {
+            const xInputString = document.getElementById("xValuesInput").value.trim();
+            const yInputString = document.getElementById("yValuesInput").value.trim();
+            const targetXInputValue = document.getElementById("targetXValue").value;
+
+            resetValidationMessage("xValuesInput");
+            resetValidationMessage("yValuesInput");
+            resetValidationMessage("targetXValue");
+
+            if (xInputString.trim() === "" || yInputString.trim() === "" || targetXInputValue.trim() === "") {
+                if (xInputString.trim() === "") displayValidationMessage("xValuesInput", "Please enter x values.");
+                if (yInputString.trim() === "") displayValidationMessage("yValuesInput", "Please enter y values.");
+                if (targetXInputValue.trim() === "") displayValidationMessage("targetXValue", "Please enter target x value.");
+                return;
+            }
+
+            const xValueArray = xInputString.split(",").map(num => parseFloat(num));
+            const yValueArray = yInputString.split(",").map(num => parseFloat(num));
+            const targetXValue = parseFloat(targetXInputValue);
+
+            if (xValueArray.some(isNaN)) {
+                displayValidationMessage("xValuesInput", "Invalid x value(s). Must be comma-separated numbers.");
+                return;
+            }
+            if (yValueArray.some(isNaN)) {
+                displayValidationMessage("yValuesInput", "Invalid y value(s). Must be comma-separated numbers.");
+                return;
+            }
+            if (isNaN(targetXValue)) {
+                displayValidationMessage("targetXValue", "Target x must be a number.");
+                return;
+            }
+            if (xValueArray.length !== yValueArray.length) {
+                displayValidationMessage("yValuesInput", "Number of y values must match number of x values.");
+                return;
+            }
+
+            try {
+                const serverResponse = await fetch("/math/first-derivative", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ x: xValueArray, y: yValueArray, targetX: targetXValue })
+                });
+
+                const rawResponseText = await serverResponse.text();
+                console.log("Raw response:", rawResponseText);
+
+                const derivativeData = JSON.parse(rawResponseText);
+                console.log("Parsed data:", derivativeData);
+
+                document.getElementById("derivativeResultArea").innerText = `Derivative at x=${targetXValue}: ${derivativeData.derivative}`;
+            } catch (errorInfo) {
+                console.error("Error:", errorInfo);
+                document.getElementById("derivativeResultArea").innerText = "Error computing derivative.";
+            }
+        }
+
+        function displayValidationMessage(inputId, message) {
+            let errorSpanId = inputId + "-error";
+            let errorSpan = document.getElementById(errorSpanId);
+
+            if (!errorSpan) {
+                errorSpan = document.createElement('span');
+                errorSpan.id = errorSpanId;
+                errorSpan.className = 'validation-error';
+                document.getElementById(inputId).parentNode.insertBefore(errorSpan, document.getElementById(inputId).nextSibling);
+            }
+            errorSpan.innerText = " ❌ " + message;
+        }
+
+        function resetValidationMessage(inputId) {
+            let errorSpanId = inputId + "-error";
+            let errorSpan = document.getElementById(errorSpanId);
+            if (errorSpan) {
+                errorSpan.innerText = "";
+            }
+        }
+
+        function plotFunctionGraph() {
+            const canvas = document.getElementById('functionPlotCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const xValuesForPlot = [];
+            const yValuesForPlot = [];
+
+            for (let i = 0; i <= 100; i++) {
+                const x = 0 + (1 - 0) * (i / 100);
+                const y = Math.cos(x) - x;
+                xValuesForPlot.push(x);
+                yValuesForPlot.push(y);
+            }
+
+            if (window.functionChart) {
+                window.functionChart.destroy();
+            }
+
+            window.functionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xValuesForPlot,
+                    datasets: [{
+                        label: 'f(x) = cos(x) - x',
+                        data: yValuesForPlot,
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: 'x' }
+                        },
+                        y: {
+                            title: { display: true, text: 'f(x)' },
+                            position: 'left',
+                            beginAtZero: false
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        zoom: {
+                            zoom: {
+                                wheel: { enabled: true },
+                                pinch: { enabled: true },
+                                mode: 'xy',
+                            },
+                            pan: {
+                                enabled: true,
+                                mode: 'xy',
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        async function computeNumericalRoot() {
+            const a = document.getElementById("bisectionA").value;
+            const b = document.getElementById("bisectionB").value;
+            const tolerance = document.getElementById("bisectionTolerance").value;
+            const maxIterations = document.getElementById("bisectionMaxIter").value;
+
+            const graphicalApproxRoot = parseFloat(document.getElementById("graphicalRootApprox").value) || 0.74;
+
+            if (isNaN(a) || isNaN(b) || isNaN(tolerance) || isNaN(maxIterations)) {
+                alert("Please enter valid numbers for interval, tolerance, and max iterations.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/math/bisection-root", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ a, b, tolerance, maxIterations })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const numericalRoot = data.root;
+                    const iterations = data.iterations;
+
+                    document.getElementById("numericalRootResult").innerText = numericalRoot.toFixed(6) + ` (Iterations: ${iterations})`;
+
+                    const absoluteError = Math.abs(numericalRoot - graphicalApproxRoot);
+                    document.getElementById("graphicalRootError").innerText = absoluteError.toFixed(6);
+                } else {
+                    document.getElementById("numericalRootResult").innerText = "Error: " + data.error;
+                    document.getElementById("graphicalRootError").innerText = "N/A";
+                }
+
+            } catch (error) {
+                console.error("Error calling bisection route:", error);
+                document.getElementById("numericalRootResult").innerText = "Error computing numerical root.";
+                document.getElementById("graphicalRootError").innerText = "N/A";
+            }
+        }
+
+        async function computeFalsePositionRoot() {
+            const a = parseFloat(document.getElementById("falsePositionA").value);
+            const b = parseFloat(document.getElementById("falsePositionB").value);
+            const tolerance = parseFloat(document.getElementById("falsePositionTolerance").value);
+            const maxIterations = parseInt(document.getElementById("falsePositionMaxIter").value, 10);
+
+            if (isNaN(a) || isNaN(b) || isNaN(tolerance) || isNaN(maxIterations)) {
+                alert("Please enter valid numbers for interval, tolerance, and max iterations.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/math/false-position-root", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ a, b, tolerance, maxIterations })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("falsePositionRootResult").innerText = data.root.toFixed(6);
+                    document.getElementById("falsePositionIterations").innerText = data.iterations;
+                    document.getElementById("falsePositionRelativeError").innerText = data.relativeError.toFixed(6);
+
+                    // Update comparison table
+                    document.getElementById("compFalsePositionRoot").innerText = data.root.toFixed(6);
+                    document.getElementById("compFalsePositionIter").innerText = data.iterations;
+                    document.getElementById("compFalsePositionError").innerText = data.relativeError.toFixed(6);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Failed to compute False Position root.");
+            }
+        }
+
+        async function computeNewtonRaphsonRoot() {
+            const initialGuess = parseFloat(document.getElementById("newtonRaphsonInitialGuess").value);
+            const tolerance = parseFloat(document.getElementById("newtonRaphsonTolerance").value);
+            const maxIterations = parseInt(document.getElementById("newtonRaphsonMaxIter").value, 10);
+
+            if (isNaN(initialGuess) || isNaN(tolerance) || isNaN(maxIterations)) {
+                alert("Please enter valid numbers for initial guess, tolerance, and max iterations.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/math/newton-raphson-root", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ initialGuess, tolerance, maxIterations })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("newtonRaphsonRootResult").innerText = data.root.toFixed(6);
+                    document.getElementById("newtonRaphsonIterations").innerText = data.iterations;
+                    document.getElementById("newtonRaphsonRelativeError").innerText = data.relativeError.toFixed(6);
+
+                    // Update comparison table
+                    document.getElementById("compNewtonRaphsonRoot").innerText = data.root.toFixed(6);
+                    document.getElementById("compNewtonRaphsonIter").innerText = data.iterations;
+                    document.getElementById("compNewtonRaphsonError").innerText = data.relativeError.toFixed(6);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Failed to compute Newton-Raphson root.");
+            }
+        }
+
+        async function computeJacobiSolution() {
+            const tolerance = document.getElementById("jacobiTolerance").value;
+            const maxIterations = document.getElementById("jacobiMaxIter").value;
+
+            try {
+                const response = await fetch("/math/jacobi-solve", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tolerance, maxIterations })
+                });
+
+                const textResponse = await response.text(); // Get raw text
+                console.log("Raw response:", textResponse); // Log raw response
+                
+                const data = JSON.parse(textResponse); // Parse JSON manually
+
+                if (response.ok) {
+                    document.getElementById("jacobiSolutionArea").innerText = 
+                        `x: ${data.solution[0].toFixed(6)}, y: ${data.solution[1].toFixed(6)}, z: ${data.solution[2].toFixed(6)}`;
+                    document.getElementById("jacobiIterations").innerText = data.iterations;
+                    document.getElementById("jacobiRelativeError").innerText = data.relativeError.toFixed(6);
+                } else {
+                    document.getElementById("jacobiSolutionArea").innerText = "Error: " + data.error;
+                }
+
+            } catch (error) {
+                console.error("Error computing Jacobi solution:", error);
+                document.getElementById("jacobiSolutionArea").innerText = "Error computing solution.";
+            }
+        }
+
+        function computeTaylorSeries() {
+        const x = parseFloat(document.getElementById("taylorInputX").value);
+        
+        if (isNaN(x)) {
+            alert("Please enter a valid number for x.");
+            return;
+        }
+
+        fetch(`/math/taylor?x=${x}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("taylorResult").innerText = data.y;
+            })
+            .catch(error => {
+                console.error("Error fetching Taylor series result:", error);
+            });
+        }
+
+        function computeSimpsons38() {
+            fetch('/math/simpsons38') // Corrected URL
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('simpson_approx_value').innerText = data.approximateValue;
+                    document.getElementById('simpson_exact_value').innerText = data.exactValue;
+                    document.getElementById('simpson_absolute_error').innerText = data.absoluteError;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        // Initially hide all method sections on page load
+        showCalculationSection();
+    </script>
+</body>
+</html>
