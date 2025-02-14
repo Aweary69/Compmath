@@ -1,13 +1,16 @@
+//Iterates through the rows, summing up the diagonal elements
 function matrixTrace(A) {
     return A.reduce((sum, row, i) => sum + row[i], 0);
 }
 
+//Uses Array.from() to generate a nested array, assigning 1 where row index i equals column index j.
 function identityMatrix(n) {
     return Array.from({ length: n }, (_, i) =>
         Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
     );
 }
 
+//Uses triple nested loops to perform standard matrix multiplication.Multiply two matrix A x B.
 function multiplyMatrices(A, B) {
     let result = A.map(row => Array(B[0].length).fill(0));
     for (let i = 0; i < A.length; i++) {
@@ -20,22 +23,26 @@ function multiplyMatrices(A, B) {
     return result.map(row => row.map(val => Number(val.toFixed(10))));
 }
 
+//Loops through each element and subtracts corresponding values.
 function subtractMatrices(A, B) {
     return A.map((row, i) => row.map((val, j) => Number((val - B[i][j]).toFixed(10))));
 }
 
+// Loops through each element and adds corresponding values.
 function addMatrices(A, B) {
     return A.map((row, i) => row.map((val, j) => Number((val + B[i][j]).toFixed(10))));
 }
 
+//Uses .map() to iterate and multiply each element by scalar.
 function scaleMatrix(A, scalar) {
     return A.map(row => row.map(val => Number((val * scalar).toFixed(10))));
 }
 
+//Flattens the matrix, squares each element, sums them up, and takes the square root.
 function matrixNorm(A) {
     return Math.sqrt(A.flat().reduce((sum, val) => sum + val * val, 0));
 }
-
+//Checks if a 3x3 matrix is singular (determinant close to zero)
 function isSingular(A) {
     // Determinant check (only works for 3x3)
     let det = A[0][0] * (A[1][1] * A[2][2] - A[1][2] * A[2][1]) -
@@ -44,6 +51,7 @@ function isSingular(A) {
     return Math.abs(det) < 1e-8;
 }
 
+//this function collecting all fucntions together and start to computing.Maximum iterations is 500.Computes the matrix inverse using an iterative Newton-Schulz method.
 function iterativeMatrixInverse(A, tol = 1e-8, maxIter = 500) {
     const n = A.length;
     const I = identityMatrix(n);
