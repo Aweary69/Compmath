@@ -145,3 +145,22 @@ th {
     margin-left: 5px; /* Add a little space */
     display: block; /* Ensure it's on a new line if needed */
 }
+
+.iteration-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.iteration-table th, .iteration-table td {
+    border: 1px solid #555; /* Darker table border for dark mode */
+    padding: 8px;
+    text-align: left;
+    color: #f0f0f0; /* Light text for table data */
+}
+
+.iteration-table th {
+    background-color: #333; /* Darker header background */
+    font-weight: bold;
+    color: #fff; /* White header text */
+}

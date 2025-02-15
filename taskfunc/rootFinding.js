@@ -112,6 +112,7 @@ function newtonRaphsonMethod(func, funcDerivative, initialGuess, tolerance, maxI
     let currentGuess = initialGuess;
     let prevGuess = null; // For relative error calculation
     let relativeErrorValue = tolerance + 1; // Initialize relative error to be larger than tolerance
+    const iterationData = []; // Array to store iteration details
 
     while (iteration < maxIterations) {
         const fValue = func(currentGuess);
@@ -119,16 +120,23 @@ function newtonRaphsonMethod(func, funcDerivative, initialGuess, tolerance, maxI
 
         // Check if derivative is zero (to prevent division by zero)
         if (fDerivativeValue === 0) {
-            return { root: null, iterations: iteration + 1, relativeError: NaN, error: "Derivative is zero. Newton-Raphson method failed." }; // Method fails if derivative is zero
+            return { root: null, iterations: iteration + 1, relativeError: NaN, error: "Derivative is zero. Newton-Raphson method failed.", iterationDetails: iterationData }; // Method fails if derivative is zero
         }
 
         // Calculate relative error, handling the case of initialGuess being 0
         relativeErrorValue = prevGuess === null ? tolerance + 1 : Math.abs((currentGuess - prevGuess) / currentGuess);
 
+        // Store iteration data  <---  THIS PART WAS MISSING!
+        iterationData.push({ 
+            iteration: iteration + 1,
+            rootApprox: currentGuess,
+            fValue: fValue,
+            relativeError: relativeErrorValue
+        });
 
         // Check for convergence based on function value and relative error
         if (Math.abs(fValue) <= tolerance || relativeErrorValue <= tolerance) {
-            return { root: currentGuess, iterations: iteration + 1, relativeError: relativeErrorValue, error: null }; // Root found
+            return { root: currentGuess, iterations: iteration + 1, relativeError: relativeErrorValue, error: null, iterationDetails: iterationData }; // Root found
         }
 
         prevGuess = currentGuess; // Update previous guess for relative error calculation
@@ -137,8 +145,14 @@ function newtonRaphsonMethod(func, funcDerivative, initialGuess, tolerance, maxI
     }
 
     // Max iterations reached, return with a possible error message and the last calculated relative error
-    return { root: currentGuess, iterations: maxIterations, relativeError: relativeErrorValue, error: "Maximum iterations reached." };
+    relativeErrorValue = prevGuess === null ? NaN : Math.abs((currentGuess - prevGuess) / currentGuess);
+    iterationData.push({ // Store last iteration data even if max iterations reached
+        iteration: maxIterations,
+        rootApprox: currentGuess,
+        fValue: func(currentGuess),
+        relativeError: relativeErrorValue
+    });
+    return { root: currentGuess, iterations: maxIterations, relativeError: relativeErrorValue, error: "Maximum iterations reached.", iterationDetails: iterationData }; // Return calculated relativeErrorValue
 }
-
 
 module.exports = { bisectionMethod, falsePositionMethod, newtonRaphsonMethod };

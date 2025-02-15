@@ -4,7 +4,9 @@ const { iterativeMatrixInverse } = require("../taskfunc/matrixOperations");
 const { linearLeastSquaresFit } = require("../taskfunc/curveFitting");
 const { newtonsForwardDifference } = require("../taskfunc/firstDerivative");
 const { bisectionMethod, falsePositionMethod, newtonRaphsonMethod } = require("../taskfunc/rootFinding");
-const { jacobiMethod } = require("../taskfunc/jacobiMethod"); // ✅ Import Jacobi Method
+const { jacobiMethod } = require("../taskfunc/jacobiMethod");
+const { taylorSeriesApprox } = require("../taskfunc/taylorSeries");
+const { f_x_task8, simpsons38Rule } = require("../taskfunc/simpsonsRule"); 
 
 // Matrix Inversion Route
 router.post("/inverse", (req, res) => {
@@ -65,7 +67,7 @@ router.post("/false-position-root", (req, res) => {
         if (result.error) {
             return res.status(400).json({ error: result.error });
         }
-        res.json({ root: result.root, iterations: result.iterations, relativeError: result.relativeError });
+        res.json({ root: result.root, iterations: result.iterations, relativeError: result.relativeError, iterationDetails: result.iterationDetails }); // Send iterationDetails
     } catch (error) {
         res.status(500).json({ error: "Server error during False Position Method: " + error.message });
     }
@@ -81,11 +83,15 @@ router.post("/newton-raphson-root", (req, res) => {
         if (result.error) {
             return res.status(400).json({ error: result.error });
         }
-        res.json({ root: result.root, iterations: result.iterations, relativeError: result.relativeError });
+
+        console.log("Newton-Raphson Result from Backend:", result);  // ADD THIS LINE
+
+        res.json({ root: result.root, iterations: result.iterations, relativeError: result.relativeError, iterationDetails: result.iterationDetails });
     } catch (error) {
         res.status(500).json({ error: "Server error during Newton-Raphson Method: " + error.message });
     }
 });
+
 
 // Jacobi Method Route (Task 3)
 router.post("/jacobi-solve", (req, res) => {
