@@ -3,7 +3,8 @@ const router = express.Router();
 const { iterativeMatrixInverse } = require("../taskfunc/matrixOperations");
 const { linearLeastSquaresFit } = require("../taskfunc/curveFitting");
 const { newtonsForwardDifference } = require("../taskfunc/firstDerivative");
-const { bisectionMethod, falsePositionMethod, newtonRaphsonMethod } = require("../taskfunc/rootFinding"); // ✅ Import all three root-finding methods
+const { bisectionMethod, falsePositionMethod, newtonRaphsonMethod } = require("../taskfunc/rootFinding");
+const { jacobiMethod } = require("../taskfunc/jacobiMethod"); // ✅ Import Jacobi Method
 
 // Matrix Inversion Route
 router.post("/inverse", (req, res) => {
@@ -83,6 +84,33 @@ router.post("/newton-raphson-root", (req, res) => {
         res.json({ root: result.root, iterations: result.iterations, relativeError: result.relativeError });
     } catch (error) {
         res.status(500).json({ error: "Server error during Newton-Raphson Method: " + error.message });
+    }
+});
+
+// Jacobi Method Route (Task 3)
+router.post("/jacobi-solve", (req, res) => {
+    try {
+        const { matrixA, vectorB, initialGuess, tolerance, maxIterations } = req.body;
+
+        // Convert inputs from strings to numbers
+        const A = matrixA.map(row => row.map(Number));
+        const b = vectorB.map(Number);
+        const x0 = initialGuess.map(Number);
+
+        // Input validation (basic)
+        if (!Array.isArray(A) || !Array.isArray(b) || !Array.isArray(x0) || A.length !== 3 || A[0].length !== 3 || b.length !== 3 || x0.length !== 3 || isNaN(tolerance) || isNaN(maxIterations)) {
+            return res.status(400).json({ error: "Invalid input format for Jacobi Method." });
+        }
+
+        const result = jacobiMethod(A, b, x0, parseFloat(tolerance), parseInt(maxIterations));
+
+        if (result.error) {
+            return res.status(400).json({ error: result.error });
+        }
+        // Format solution to 6 decimal places for display
+        res.json({ solution: result.solution.map(val => val.toFixed(6)), iterations: result.iterations });
+    } catch (error) {
+        res.status(500).json({ error: "Server error during Jacobi Method: " + error.message });
     }
 });
 

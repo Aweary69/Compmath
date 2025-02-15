@@ -122,7 +122,8 @@ th {
 /* Result Area Styling */
 #inverseResultArea,
 #curveFitResultArea,
-#derivativeResultArea {
+#derivativeResultArea,
+#falsePositionRootResult, #newtonRaphsonRootResult, #numericalRootResult, #graphicalRootError, #jacobiSolution_x, #jacobiSolution_y, #jacobiSolution_z, #falsePositionIterations, #falsePositionRelativeError, #newtonRaphsonIterations, #newtonRaphsonRelativeError, #jacobiIterations {
     margin-top: 15px;
     padding: 15px;
     border: 2px solid #555; /* Darker result area border */
@@ -133,6 +134,9 @@ th {
     font-size: 0.9rem;
     color: #f0f0f0; /* Light result text */
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.4); /* Inset shadow for dark mode */
+    display: inline-block; /* To make span elements respect padding and border */
+    min-width: 50px; /* Ensure a minimum width for results to be displayed nicely */
+    text-align: center; /* Center text in result areas */
 }
 
 .validation-error {
