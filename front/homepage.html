@@ -15,23 +15,23 @@
         <option value="">-- Select a Method --</option>
         <option value="graphicalRoot">Graphical Root Finding</option>
         <option value="comparisonRootMethods">Comparison of Root-Finding Methods</option>
-        <option value="jacobiMethod">Jacobi Method: Solving a System of Equations</option>
+        <option value="jacobiMethod">Jacobi Method</option>
         <option value="matrixInverse">Matrix Inversion</option>
         <option value="curveFitting">Linear Curve Fitting</option>
         <option value="firstDerivative">First Derivative (Newton's Forward Difference)</option>
-        <option value="taylorSeries">Taylor Series Approximation</option>
-        <option value="simpsons38">Simpson’s 3/8 Rule Integration</option>
+        <option value="taylorSeriesMethod">Taylor Series Method</option>
+        <option value="simpson38RuleMethod">Simpson's 3/8 Rule</option>
     </select>
 
     <div id="matrixSection" class="method-section hidden-section" data-method="matrixInverse">
         <h2>Matrix Inversion Operation</h2>
         <p>Specify Matrix Dimensions (up to 5x5 for simplicity):</p>
-        <label for="matrixRows">Rows:</label>
-        <input type="number" id="matrixRows" value="3" min="1" max="5">
-        <label for="matrixCols">Columns:</label>
-        <input type="number" id="matrixCols" value="3" min="1" max="5">
-        <button onclick="generateMatrixInputFields()">Generate Matrix Input</button>
-        <div id="matrixInputAreaContainer"></div>
+        <label for="matrixRows_inverse">Rows:</label>
+        <input type="number" id="matrixRows_inverse" value="3" min="1" max="5">
+        <label for="matrixCols_inverse">Columns:</label>
+        <input type="number" id="matrixCols_inverse" value="3" min="1" max="5">
+        <button onclick="generateMatrixInputFields('inverse')">Generate Matrix Input</button>
+        <div id="matrixInputAreaContainer_inverse"></div>
         <button onclick="initiateInverseComputation()">Compute Inverse</button>
         <h3>Resulting Inverse Matrix:</h3>
         <div id="inverseResultArea"></div>
@@ -43,8 +43,7 @@
         <textarea id="pointsInputArea" placeholder="e.g., 1,5 2,8 3,12"></textarea>
         <button onclick="commenceCurveFitting()">Compute Fit</button>
         <h3>Best-Fit Line Equation:</h3>
-        <pre id="curveFitResultArea"></pre>
-    </div>
+        <pre id="curveFitResultArea"></pre>    </div>
 
     <div id="derivativeSection" class="method-section hidden-section" data-method="firstDerivative">
         <h2>Newton's Forward Difference Derivative Calculation</h2>
@@ -60,7 +59,9 @@
     </div>
 
     <div id="graphicalRootSection" class="method-section hidden-section" data-method="graphicalRoot">
-        <h2>Graphical Root Finding (f(x) = cos(x) - x)</h2>
+        <h2>Graphical Root Finding</h2>
+        <p>Enter function f(x): (e.g., cos(x)-x)</p>
+        <input type="text" id="graphicalFunctionInput" value="Math.cos(x)-x" placeholder="Enter function f(x)">
         <canvas id="functionPlotCanvas" width="400" height="300"></canvas> <br>
         <p>
             Approximate Root (from graph):
@@ -79,128 +80,112 @@
     </div>
 
     <div id="comparisonRootFindingSection" class="method-section hidden-section" data-method="comparisonRootMethods">
-        <h2>Comparison of Root-Finding Methods (f(x) = x² - 4sin(x))</h2>
-        <p>Function: f(x) = x² - 4sin(x), Interval: [0, 3]</p>
-    
+        <h2>Comparison of Root-Finding Methods</h2>
+        <p>Enter function f(x): (e.g., x*x - 4*Math.sin(x))</p>
+        <input type="text" id="comparisonFunctionInput" value="x*x - 4*Math.sin(x)" placeholder="Enter function f(x)">
+        <p>Interval for root finding: [0, 3]</p>
+
         <h3>False Position Method</h3>
         <p>Interval [a, b]:</p>
         <label for="falsePositionA">a:</label> <input type="number" id="falsePositionA" value="0">
         <label for="falsePositionB">b:</label> <input type="number" id="falsePositionB" value="3">
         <label for="falsePositionTolerance">Tolerance:</label> <input type="number" id="falsePositionTolerance" value="0.0001">
         <label for="falsePositionMaxIter">Max Iterations:</label> <input type="number" id="falsePositionMaxIter" value="100">
-        <button onclick="computeFalsePositionRoot()">Compute Root (False Position)</button> 
-        <p>Root: <span id="falsePositionRootResult"></span>, Iterations: <span id="falsePositionIterations"></span>, Relative Error: <span id="falsePositionRelativeError"></span></p>
-    
+        <button onclick="computeFalsePositionRoot()">Compute Root (False Position)</button> <br>
+        <p>Root (False Position): <span id="falsePositionRootResult"></span>, Iterations: <span id="falsePositionIterations"></span>, Relative Error: <span id="falsePositionRelativeError"></span></p>
+
         <h3>Newton-Raphson Method</h3>
         <p>Initial Guess (x₀):</p>
         <label for="newtonRaphsonInitialGuess">x₀:</label> <input type="number" id="newtonRaphsonInitialGuess" value="0.5">
         <label for="newtonRaphsonTolerance">Tolerance:</label> <input type="number" id="newtonRaphsonTolerance" value="0.0001">
         <label for="newtonRaphsonMaxIter">Max Iterations:</label> <input type="number" id="newtonRaphsonMaxIter" value="100">
-        <button onclick="computeNewtonRaphsonRoot()">Compute Root (Newton-Raphson)</button>
-        <p>Root: <span id="newtonRaphsonRootResult"></span>, Iterations: <span id="newtonRaphsonIterations"></span>, Relative Error: <span id="newtonRaphsonRelativeError"></span></p>
-    
-        <h3>Comparison</h3>
-        <table border="1">
-            <tr>
-                <th>Method</th>
-                <th>Root</th>
-                <th>Iterations</th>
-                <th>Relative Error</th>
-            </tr>
-            <tr>
-                <td>False Position</td>
-                <td id="compFalsePositionRoot"></td>
-                <td id="compFalsePositionIter"></td>
-                <td id="compFalsePositionError"></td>
-            </tr>
-            <tr>
-                <td>Newton-Raphson</td>
-                <td id="compNewtonRaphsonRoot"></td>
-                <td id="compNewtonRaphsonIter"></td>
-                <td id="compNewtonRaphsonError"></td>
-            </tr>
-        </table>
+        <button onclick="computeNewtonRaphsonRoot()">Compute Root (Newton-Raphson)</button> <br>
+        <p>Root (Newton-Raphson): <span id="newtonRaphsonRootResult"></span>, Iterations: <span id="newtonRaphsonIterations"></span>, Relative Error: <span id="newtonRaphsonRelativeError"></span></p>
     </div>
-    
+
     <div id="jacobiSection" class="method-section hidden-section" data-method="jacobiMethod">
-        <h2>Jacobi Method: Solving a System of Equations</h2>
-        <p>System of Equations:</p>
-        <pre>
-            3x + y - z = 1
-            2x - 8y + z = -2
-            -x + y + 5z = 3
-        </pre>
-    
-        <p>Enter tolerance:</p>
-        <input type="number" id="jacobiTolerance" placeholder="e.g., 0.0001" value="0.0001">
-        
-        <p>Enter max iterations:</p>
-        <input type="number" id="jacobiMaxIter" placeholder="e.g., 100" value="100">
-        
-        <button onclick="computeJacobiSolution()">Compute Solution</button>
-        
-        <h3>Solution:</h3>
-        <pre id="jacobiSolutionArea"></pre>
-        
-        <h3>Iterations:</h3>
-        <pre id="jacobiIterations"></pre>
-        
-        <h3>Relative Error:</h3>
-        <pre id="jacobiRelativeError"></pre>
+        <h2>Jacobi Method for System of Equations</h2>
+        <p>Solve a system of linear equations Ax = b:</p>
+
+        <p>Specify Matrix Dimensions (up to 5x5 for simplicity):</p>
+        <label for="matrixRows_jacobi">Rows:</label>
+        <input type="number" id="matrixRows_jacobi" value="3" min="1" max="5">
+        <label for="matrixCols_jacobi">Columns:</label>
+        <input type="number" id="matrixCols_jacobi" value="3" min="1" max="5" readonly> <p>(Columns must equal rows for Jacobi Method)</p>
+        <button onclick="generateMatrixInputFields('jacobi')">Generate Matrix Input for Jacobi</button>
+        <div id="matrixInputAreaContainer_jacobi"></div>
+        <div id="vectorBInputAreaContainer_jacobi"></div>
+
+        <p>Initial Guess x₀:</p>
+        <div id="initialGuessInputArea_jacobi"></div>
+
+
+        <label for="jacobiTolerance">Tolerance:</label> <input type="number" id="jacobiTolerance" value="0.0001">
+        <label for="jacobiMaxIter">Max Iterations:</label> <input type="number" id="jacobiMaxIter" value="100">
+        <button onclick="computeJacobiSolution()">Solve System (Jacobi)</button> <br>
+        <h3>Solution (x, y, z, ...):</h3>
+        <p><span id="jacobiSolutionArea"></span>, Iterations: <span id="jacobiIterations"></span></p>
     </div>
 
-    <div id="taylorSeriesSection" class="method-section hidden-section" data-method="taylorSeries">
-        <h2>Taylor Series Approximation (dy/dx = y² + x², y(0) = 1)</h2>
-        
-        <p>
-            Compute y(x) using Taylor Series:
-            <label for="taylorInputX">x:</label>
-            <input type="number" id="taylorInputX" value="0.1" step="0.01">
-            <button onclick="computeTaylorSeries()">Compute</button>
-        </p>
-    
-        <p>Approximate y(x): <span id="taylorResult"></span></p>
+    <div id="taylorSeriesSection" class="method-section hidden-section" data-method="taylorSeriesMethod">
+        <h2>Taylor Series Method for ODE</h2>
+        <p>Solve dy/dx = y² + x², y(0) = 1</p>
+        <button onclick="computeTaylorSeriesValues()">Compute y(0.1) and y(0.2)</button> <br>
+        <h3>Approximated Values:</h3>
+        <p>y(0.1) ≈ <span id="taylor_y_0_1"></span></p>
+        <p>y(0.2) ≈ <span id="taylor_y_0_2"></span></p>
     </div>
 
-    <div id="simpsons38Section" class="method-section hidden-section" data-method="simpsons38">
-        <h2>Simpson’s 3/8 Rule Integration (∫ x³ dx from 2 to 5)</h2>
-    
-        <p>
-            Compute Integral using Simpson’s 3/8 Rule:
-            <button onclick="computeSimpsons38()">Compute</button>
-        </p>
-    
-        <p>Approximate Integral Value: <span id="simpson_approx_value"></span></p>
-        <p>Exact Integral Value: <span id="simpson_exact_value"></span></p>
+    <div id="simpson38Section" class="method-section hidden-section" data-method="simpson38RuleMethod">
+        <h2>Simpson's 3/8 Rule for Integration</h2>
+        <p>Compute ∫₂⁵ 2x³ dx with 6 subintervals</p>
+        <button onclick="computeSimpsons38Rule()">Compute Integral</button> <br>
+        <h3>Results:</h3>
+        <p>Approximate Value (Simpson's 3/8): <span id="simpson_approx_value"></span></p>
+        <p>Exact Value: <span id="simpson_exact_value"></span></p>
         <p>Absolute Error: <span id="simpson_absolute_error"></span></p>
     </div>
-    
 
     <script>
-        function generateMatrixInputFields() {
-            const rowsInput = document.getElementById("matrixRows");
-            const colsInput = document.getElementById("matrixCols");
-            const container = document.getElementById("matrixInputAreaContainer");
-            container.innerHTML = '';
-            resetValidationMessage("matrixRows");
-            resetValidationMessage("matrixCols");
+        // Function to generate matrix input fields dynamically
+        function generateMatrixInputFields(method) {
+            let rowsInputId, colsInputId, containerId;
+            if (method === 'inverse') {
+                rowsInputId = "matrixRows_inverse";
+                colsInputId = "matrixCols_inverse";
+                containerId = "matrixInputAreaContainer_inverse";
+            } else if (method === 'jacobi') {
+                rowsInputId = "matrixRows_jacobi";
+                colsInputId = "matrixCols_jacobi";
+                containerId = "matrixInputAreaContainer_jacobi";
+            } else {
+                console.error("Invalid method for generateMatrixInputFields");
+                return;
+            }
+
+            const rowsInput = document.getElementById(rowsInputId);
+            const colsInput = document.getElementById(colsInputId);
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Clear previous inputs
+            resetValidationMessage(rowsInputId);
+            resetValidationMessage(colsInputId);
 
             const rows = parseInt(rowsInput.value);
             const cols = parseInt(colsInput.value);
 
             if (isNaN(rows) || isNaN(cols)) {
-                displayValidationMessage("matrixRows", "Rows must be a number.");
-                displayValidationMessage("matrixCols", "Columns must be a number.");
+                displayValidationMessage(rowsInputId, "Rows must be a number.");
+                displayValidationMessage(colsInputId, "Columns must be a number.");
                 return;
             }
             if (!Number.isInteger(rows) || !Number.isInteger(cols)) {
-                displayValidationMessage("matrixRows", "Rows must be an integer.");
-                displayValidationMessage("matrixCols", "Columns must be an integer.");
+                displayValidationMessage(rowsInputId, "Rows must be an integer.");
+                displayValidationMessage(colsInputId, "Columns must be an integer.");
                 return;
             }
             if (rows < 1 || rows > 5 || cols < 1 || cols > 5) {
-                displayValidationMessage("matrixRows", "Rows must be between 1 and 5.");
-                displayValidationMessage("matrixCols", "Columns must be between 1 and 5.");
+                displayValidationMessage(rowsInputId, "Rows must be between 1 and 5.");
+                displayValidationMessage(colsInputId, "Columns must be between 1 and 5.");
                 return;
             }
 
@@ -212,22 +197,68 @@
                     let input = document.createElement('input');
                     input.type = 'number';
                     input.classList.add('matrix-input-cell');
-                    input.id = `matrix-input-${i}-${j}`;
+                    input.id = `${method}-matrix-input-${i}-${j}`;
                     cell.appendChild(input);
                 }
             }
             container.appendChild(table);
+
+            if (method === 'jacobi') {
+                generateVectorBInputFields(rows);
+                generateInitialGuessInputFields(rows);
+            }
         }
 
+        function generateVectorBInputFields(size) {
+            const container = document.getElementById("vectorBInputAreaContainer_jacobi");
+            container.innerHTML = '';
+            let table = document.createElement('table');
+            let headerRow = table.insertRow();
+            let headerCell = document.createElement('th');
+            headerCell.textContent = 'Vector b:';
+            headerRow.appendChild(headerCell);
+
+            for (let i = 0; i < size; i++) {
+                let row = table.insertRow();
+                let cell = row.insertCell();
+                let input = document.createElement('input');
+                input.type = 'number';
+                input.id = `jacobi-vector-b-input-${i}`;
+                cell.appendChild(input);
+            }
+            container.appendChild(table);
+        }
+
+        function generateInitialGuessInputFields(size) {
+            const container = document.getElementById("initialGuessInputArea_jacobi");
+            container.innerHTML = '';
+            let table = document.createElement('table');
+            let headerRow = table.insertRow();
+            let headerCell = document.createElement('th');
+            headerCell.textContent = 'Initial Guess x₀:';
+            headerRow.appendChild(headerCell);
+            for (let i = 0; i < size; i++) {
+                let row = table.insertRow();
+                let cell = row.insertCell();
+                let input = document.createElement('input');
+                input.type = 'number';
+                input.value = 0; // Default initial guess to 0
+                input.id = `jacobi-initial-guess-input-${i}`;
+                cell.appendChild(input);
+            }
+            container.appendChild(table);
+        }
+
+
         async function initiateInverseComputation() {
-            const rows = parseInt(document.getElementById("matrixRows").value);
-            const cols = parseInt(document.getElementById("matrixCols").value);
+            const rows = parseInt(document.getElementById("matrixRows_inverse").value);
+            const cols = parseInt(document.getElementById("matrixCols_inverse").value);
             let matrix = [];
             let isValidMatrix = true;
             for (let i = 0; i < rows; i++) {
                 let row = [];
                 for (let j = 0; j < cols; j++) {
-                    const inputElement = document.getElementById(`matrix-input-${i}-${j}`);
+                    const inputElement = document.getElementById(`inverse-matrix-input-${i}-${j}`);
                     const inputValue = parseFloat(inputElement.value);
                     resetValidationMessage(inputElement.id);
                     if (isNaN(inputValue)) {
@@ -393,7 +424,6 @@
         function displayValidationMessage(inputId, message) {
             let errorSpanId = inputId + "-error";
             let errorSpan = document.getElementById(errorSpanId);
-
             if (!errorSpan) {
                 errorSpan = document.createElement('span');
                 errorSpan.id = errorSpanId;
@@ -414,13 +444,24 @@
         function plotFunctionGraph() {
             const canvas = document.getElementById('functionPlotCanvas');
             const ctx = canvas.getContext('2d');
+            const functionInput = document.getElementById('graphicalFunctionInput').value;
 
             const xValuesForPlot = [];
             const yValuesForPlot = [];
 
             for (let i = 0; i <= 100; i++) {
                 const x = 0 + (1 - 0) * (i / 100);
-                const y = Math.cos(x) - x;
+                let y;
+                try {
+                    // Evaluate the user-provided function string, using 'x' as the variable
+                    y = eval(functionInput.replace(/Math\./g, 'Math.')); // Basic Math. fix for eval
+                    if (typeof y !== 'number' || isNaN(y)) {
+                        y = NaN; // Handle cases where evaluation doesn't return a number
+                    }
+                } catch (error) {
+                    console.error("Function evaluation error:", error);
+                    y = NaN; // Set y to NaN in case of error
+                }
                 xValuesForPlot.push(x);
                 yValuesForPlot.push(y);
             }
@@ -434,7 +475,7 @@
                 data: {
                     labels: xValuesForPlot,
                     datasets: [{
-                        label: 'f(x) = cos(x) - x',
+                        label: 'f(x) = ' + functionInput,
                         data: yValuesForPlot,
                         borderColor: 'blue',
                         borderWidth: 2,
@@ -476,19 +517,31 @@
             });
         }
 
-
         async function computeNumericalRoot() {
             const a = document.getElementById("bisectionA").value;
             const b = document.getElementById("bisectionB").value;
             const tolerance = document.getElementById("bisectionTolerance").value;
             const maxIterations = document.getElementById("bisectionMaxIter").value;
-
             const graphicalApproxRoot = parseFloat(document.getElementById("graphicalRootApprox").value) || 0.74;
+            const functionInput = document.getElementById('graphicalFunctionInput').value;
+
 
             if (isNaN(a) || isNaN(b) || isNaN(tolerance) || isNaN(maxIterations)) {
                 alert("Please enter valid numbers for interval, tolerance, and max iterations.");
                 return;
             }
+
+            const func = (x) => { // Define function to be used in bisection method, using user input
+                try {
+                    let y = eval(functionInput.replace(/Math\./g, 'Math.')); // Evaluate user function
+                    if (typeof y !== 'number' || isNaN(y)) return NaN;
+                    return y;
+                } catch (error) {
+                    console.error("Function evaluation error:", error);
+                    return NaN;
+                }
+            };
+
 
             try {
                 const response = await fetch("/math/bisection-root", {
@@ -520,13 +573,13 @@
         }
 
         async function computeFalsePositionRoot() {
-            const a = parseFloat(document.getElementById("falsePositionA").value);
-            const b = parseFloat(document.getElementById("falsePositionB").value);
-            const tolerance = parseFloat(document.getElementById("falsePositionTolerance").value);
-            const maxIterations = parseInt(document.getElementById("falsePositionMaxIter").value, 10);
+            const a = document.getElementById("falsePositionA").value;
+            const b = document.getElementById("falsePositionB").value;
+            const tolerance = document.getElementById("falsePositionTolerance").value;
+            const maxIterations = document.getElementById("falsePositionMaxIter").value;
 
             if (isNaN(a) || isNaN(b) || isNaN(tolerance) || isNaN(maxIterations)) {
-                alert("Please enter valid numbers for interval, tolerance, and max iterations.");
+                alert("Please enter valid numbers for interval, tolerance, and max iterations for False Position.");
                 return;
             }
 
@@ -543,27 +596,28 @@
                     document.getElementById("falsePositionRootResult").innerText = data.root.toFixed(6);
                     document.getElementById("falsePositionIterations").innerText = data.iterations;
                     document.getElementById("falsePositionRelativeError").innerText = data.relativeError.toFixed(6);
-
-                    // Update comparison table
-                    document.getElementById("compFalsePositionRoot").innerText = data.root.toFixed(6);
-                    document.getElementById("compFalsePositionIter").innerText = data.iterations;
-                    document.getElementById("compFalsePositionError").innerText = data.relativeError.toFixed(6);
                 } else {
-                    throw new Error(data.error);
+                    document.getElementById("falsePositionRootResult").innerText = "Error: " + data.error;
+                    document.getElementById("falsePositionIterations").innerText = "N/A";
+                    document.getElementById("falsePositionRelativeError").innerText = "N/A";
                 }
+
             } catch (error) {
-                console.error("Error:", error);
-                alert("Failed to compute False Position root.");
+                console.error("Error calling false position route:", error);
+                document.getElementById("falsePositionRootResult").innerText = "Error computing root.";
+                document.getElementById("falsePositionIterations").innerText = "N/A";
+                document.getElementById("falsePositionRelativeError").innerText = "N/A";
             }
         }
 
+
         async function computeNewtonRaphsonRoot() {
-            const initialGuess = parseFloat(document.getElementById("newtonRaphsonInitialGuess").value);
-            const tolerance = parseFloat(document.getElementById("newtonRaphsonTolerance").value);
-            const maxIterations = parseInt(document.getElementById("newtonRaphsonMaxIter").value, 10);
+            const initialGuess = document.getElementById("newtonRaphsonInitialGuess").value;
+            const tolerance = document.getElementById("newtonRaphsonTolerance").value;
+            const maxIterations = document.getElementById("newtonRaphsonMaxIter").value;
 
             if (isNaN(initialGuess) || isNaN(tolerance) || isNaN(maxIterations)) {
-                alert("Please enter valid numbers for initial guess, tolerance, and max iterations.");
+                alert("Please enter valid numbers for initial guess, tolerance, and max iterations for Newton-Raphson.");
                 return;
             }
 
@@ -580,82 +634,156 @@
                     document.getElementById("newtonRaphsonRootResult").innerText = data.root.toFixed(6);
                     document.getElementById("newtonRaphsonIterations").innerText = data.iterations;
                     document.getElementById("newtonRaphsonRelativeError").innerText = data.relativeError.toFixed(6);
-
-                    // Update comparison table
-                    document.getElementById("compNewtonRaphsonRoot").innerText = data.root.toFixed(6);
-                    document.getElementById("compNewtonRaphsonIter").innerText = data.iterations;
-                    document.getElementById("compNewtonRaphsonError").innerText = data.relativeError.toFixed(6);
                 } else {
-                    throw new Error(data.error);
+                    document.getElementById("newtonRaphsonRootResult").innerText = "Error: " + data.error;
+                    document.getElementById("newtonRaphsonIterations").innerText = "N/A";
+                    document.getElementById("newtonRaphsonRelativeError").innerText = "N/A";
                 }
+
             } catch (error) {
-                console.error("Error:", error);
-                alert("Failed to compute Newton-Raphson root.");
+                console.error("Error calling newton raphson route:", error);
+                document.getElementById("newtonRaphsonRootResult").innerText = "Error computing root.";
+                document.getElementById("newtonRaphsonIterations").innerText = "N/A";
+                document.getElementById("newtonRaphsonRelativeError").innerText = "N/A";
             }
         }
 
         async function computeJacobiSolution() {
+            const rows = parseInt(document.getElementById("matrixRows_jacobi").value);
+            const cols = parseInt(document.getElementById("matrixCols_jacobi").value);
+            let matrixA = [];
+            let vectorB = [];
+            let initialGuess = [];
+            let isValidMatrix = true;
+
+            for (let i = 0; i < rows; i++) {
+                let matrixRow = [];
+                for (let j = 0; j < cols; j++) {
+                    const inputElement = document.getElementById(`jacobi-matrix-input-${i}-${j}`);
+                    const inputValue = parseFloat(inputElement.value);
+                    resetValidationMessage(inputElement.id);
+                    if (isNaN(inputValue)) {
+                        displayValidationMessage(inputElement.id, "Matrix value must be a number.");
+                        isValidMatrix = false;
+                    }
+                    matrixRow.push(inputValue);
+                }
+                matrixA.push(matrixRow);
+
+                const vectorBInputElement = document.getElementById(`jacobi-vector-b-input-${i}`);
+                const vectorBValue = parseFloat(vectorBInputElement.value);
+                resetValidationMessage(vectorBInputElement.id);
+                if (isNaN(vectorBValue)) {
+                    displayValidationMessage(vectorBInputElement.id, "Vector b value must be a number.");
+                    isValidMatrix = false;
+                }
+                vectorB.push(vectorBValue);
+
+                const initialGuessInputElement = document.getElementById(`jacobi-initial-guess-input-${i}`);
+                const initialGuessValue = parseFloat(initialGuessInputElement.value);
+                resetValidationMessage(initialGuessInputElement.id);
+                if (isNaN(initialGuessValue)) {
+                    displayValidationMessage(initialGuessInputElement.id, "Initial guess value must be a number.");
+                    isValidMatrix = false;
+                }
+                initialGuess.push(initialGuessValue);
+            }
+
+
             const tolerance = document.getElementById("jacobiTolerance").value;
             const maxIterations = document.getElementById("jacobiMaxIter").value;
+
+
+            if (!isValidMatrix) return;
+
 
             try {
                 const response = await fetch("/math/jacobi-solve", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tolerance, maxIterations })
+                    body: JSON.stringify({ matrixA, vectorB, initialGuess, tolerance, maxIterations })
                 });
 
-                const textResponse = await response.text(); // Get raw text
-                console.log("Raw response:", textResponse); // Log raw response
-                
-                const data = JSON.parse(textResponse); // Parse JSON manually
+                const data = await response.json();
 
                 if (response.ok) {
-                    document.getElementById("jacobiSolutionArea").innerText = 
-                        `x: ${data.solution[0].toFixed(6)}, y: ${data.solution[1].toFixed(6)}, z: ${data.solution[2].toFixed(6)}`;
+                    // Display solution dynamically
+                    let solutionText = "";
+                    for (let i = 0; i < data.solution.length; i++) {
+                        solutionText += `x${i+1}: ${data.solution[i]}, `;
+                    }
+                    document.getElementById("jacobiSolutionArea").innerText = solutionText.slice(0, -2); // Remove last comma and space
+
                     document.getElementById("jacobiIterations").innerText = data.iterations;
-                    document.getElementById("jacobiRelativeError").innerText = data.relativeError.toFixed(6);
                 } else {
                     document.getElementById("jacobiSolutionArea").innerText = "Error: " + data.error;
+                    document.getElementById("jacobiIterations").innerText = "N/A";
                 }
 
             } catch (error) {
-                console.error("Error computing Jacobi solution:", error);
+                console.error("Error calling jacobi solve route:", error);
                 document.getElementById("jacobiSolutionArea").innerText = "Error computing solution.";
+                document.getElementById("jacobiIterations").innerText = "N/A";
             }
         }
 
-        function computeTaylorSeries() {
-        const x = parseFloat(document.getElementById("taylorInputX").value);
-        
-        if (isNaN(x)) {
-            alert("Please enter a valid number for x.");
-            return;
+        // Taylor Series Calculation Functions
+        function taylorSeriesApprox(x) {
+            // Derivatives evaluated at x=0 and y(0)=1:
+            const y0 = 1;
+            const yPrime0 = 1;
+            const yDoublePrime0 = 2;
+            const yTriplePrime0 = 8;
+
+            // Taylor series expansion up to third derivative:
+            return y0 + yPrime0 * x + (yDoublePrime0 / 2) * x**2 + (yTriplePrime0 / 6) * x**3;
         }
 
-        fetch(`/math/taylor?x=${x}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("taylorResult").innerText = data.y;
-            })
-            .catch(error => {
-                console.error("Error fetching Taylor series result:", error);
-            });
+        function computeTaylorSeriesValues() {
+            const y_0_1 = taylorSeriesApprox(0.1);
+            const y_0_2 = taylorSeriesApprox(0.2);
+
+            document.getElementById('taylor_y_0_1').innerText = y_0_1.toFixed(6);
+            document.getElementById('taylor_y_0_2').innerText = y_0_2.toFixed(6);
         }
 
-        function computeSimpsons38() {
-            fetch('/math/simpsons38') // Corrected URL
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('simpson_approx_value').innerText = data.approximateValue;
-                    document.getElementById('simpson_exact_value').innerText = data.exactValue;
-                    document.getElementById('simpson_absolute_error').innerText = data.absoluteError;
-                })
-                .catch(error => console.error('Error:', error));
+        // Simpson's 3/8 Rule Calculation Functions
+        function f_x_task8(x) {
+            return 2 * x**3;
+        }
+
+        function simpsons38Rule(a, b, n) {
+            const h = (b - a) / n;
+            let integralSum = f_x_task8(a) + f_x_task8(b); // f(x0) + f(xn)
+
+            for (let i = 1; i < n; i++) {
+                const x_i = a + i * h;
+                if (i % 3 === 0) {
+                    integralSum += 2 * f_x_task8(x_i); // Coefficients of 2 for i = 3, 6, 9, ...
+                } else {
+                    integralSum += 3 * f_x_task8(x_i); // Coefficients of 3 for i ≠ 3, 6, 9, ...
+                }
+            }
+
+            return (3 * h / 8) * integralSum;
+        }
+
+        function computeSimpsons38Rule() {
+            const a = 2;
+            const b = 5;
+            const n = 6; // Number of subintervals
+
+            const approximateValue = simpsons38Rule(a, b, n);
+            const exactValue = 304.5; // We calculated this analytically
+            const absoluteError = Math.abs(exactValue - approximateValue);
+
+            document.getElementById('simpson_approx_value').innerText = approximateValue.toFixed(6);
+            document.getElementById('simpson_exact_value').innerText = exactValue.toFixed(6);
+            document.getElementById('simpson_absolute_error').innerText = absoluteError.toFixed(6);
         }
 
 
-        // Initially hide all method sections on page load
+        // Initially hide all method sections when page loads
         showCalculationSection();
     </script>
 </body>

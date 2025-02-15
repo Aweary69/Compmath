@@ -1,67 +1,88 @@
+/**
+ * Finds the root of a function within a given interval using the Bisection method.
+ * @param {function} func - The function for which to find the root.
+ * @param {number} a - The lower bound of the interval.
+ * @param {number} b - The upper bound of the interval.
+ * @param {number} tolerance - The desired accuracy of the root.
+ * @param {number} maxIterations - The maximum number of iterations allowed.
+ * @returns {{root: number|null, iterations: number, error: string|null}} - Root, number of iterations, and error message (if any).
+ */
 function bisectionMethod(func, a, b, tolerance, maxIterations) {
     let iteration = 0;
     let fa = func(a);
     let fb = func(b);
 
+    // Check if initial interval is valid (function values at endpoints must have opposite signs)
     if (fa * fb >= 0) {
-        return { root: null, error: "Function values at interval endpoints must have opposite signs." };
+        return { root: null, iterations: 0, error: "Function values at interval endpoints must have opposite signs." };
     }
 
     let currentA = a;
     let currentB = b;
+    let c = (currentA + currentB) / 2; // Initialize c for the first iteration
 
     while (iteration < maxIterations) {
-        let c = (currentA + currentB) / 2;
+        c = (currentA + currentB) / 2; // Midpoint of the current interval
         let fc = func(c);
 
+        // Check if root is found within tolerance or interval is sufficiently small
         if (Math.abs(fc) <= tolerance || (currentB - currentA) / 2 < tolerance) {
-            return { root: c, iterations: iteration + 1 };
+            return { root: c, iterations: iteration + 1, error: null }; // Root found
         }
 
+        // Narrow down the interval based on the sign of f(c)
         if (fa * fc < 0) {
-            currentB = c;
+            currentB = c; // Root is in [currentA, c]
             fb = fc;
         } else {
-            currentA = c;
+            currentA = c; // Root is in [c, currentB]
             fa = fc;
         }
         iteration++;
     }
 
-    return { root: (currentA + currentB) / 2, iterations: maxIterations, error: "Maximum iterations reached." };
+    // Maximum iterations reached without finding root within tolerance
+    return { root: c, iterations: maxIterations, error: "Maximum iterations reached." };
 }
 
+/**
+ * Finds the root of a function using the False Position method.
+ * @param {function} func - The function for which to find the root.
+ * @param {number} a - The lower bound of the interval.
+ * @param {number} b - The upper bound of the interval.
+ * @param {number} tolerance - The desired tolerance for the root.
+ * @param {number} maxIterations - Maximum number of iterations allowed.
+ * @returns {{root: number|null, iterations: number, relativeError: number, error: string|null}} - Root, iterations, relative error, and error message (if any).
+ */
 function falsePositionMethod(func, a, b, tolerance, maxIterations) {
     let iteration = 0;
     let fa = func(a);
     let fb = func(b);
 
-    // If f(a) and f(b) don't have opposite signs, adjust b slightly
+    // Check if initial interval is valid
     if (fa * fb >= 0) {
-        console.warn("Warning: Function values at interval endpoints do not have opposite signs. Adjusting bounds...");
-        b += 0.1; // Slightly shift b to avoid failure
-        fb = func(b);
+        return { root: null, iterations: 0, relativeError: NaN, error: "Function values at interval endpoints must have opposite signs." };
     }
 
     let currentA = a;
     let currentB = b;
-    let prevRoot = null; // Track previous root
-    let relativeError = null; // Initialize relative error
+    let prevRoot = null; // To calculate relative error
+    let c = 0; // Initialize c
 
     while (iteration < maxIterations) {
-        let c = (currentA * fb - currentB * fa) / (fb - fa);
+        // Calculate c using the False Position formula (secant line intersection with x-axis)
+        c = (currentA * fb - currentB * fa) / (fb - fa);
         let fc = func(c);
 
-        if (prevRoot !== null) {
-            relativeError = Math.abs((c - prevRoot) / (c || 1)); // Avoid division by zero
+        // Check for convergence based on function value and relative error
+        let relativeErrorValue = prevRoot === null ? tolerance + 1 : Math.abs((c - prevRoot) / c); // Avoid division by zero and initial error check
+        if (Math.abs(fc) <= tolerance || relativeErrorValue <= tolerance) {
+            return { root: c, iterations: iteration + 1, relativeError: relativeErrorValue, error: null }; // Root found
         }
 
-        if (Math.abs(fc) <= tolerance || (relativeError !== null && relativeError <= tolerance)) {
-            return { root: c, iterations: iteration + 1, relativeError: relativeError || 0 };
-        }
+        prevRoot = c; // Update previous root for relative error calculation
 
-        prevRoot = c; // Store previous root for relative error calculation
-
+        // Narrow down the interval based on the sign of f(c)
         if (fa * fc < 0) {
             currentB = c;
             fb = fc;
@@ -69,132 +90,55 @@ function falsePositionMethod(func, a, b, tolerance, maxIterations) {
             currentA = c;
             fa = fc;
         }
-
         iteration++;
     }
 
-    return {
-        root: prevRoot !== null ? prevRoot : (a + b) / 2, // If all else fails, return midpoint
-        iterations: maxIterations,
-        error: "Maximum iterations reached.",
-        relativeError: relativeError || 0
-    };
+    // Max iterations reached, return with a possible error message and approximate relative error
+    let relativeErrorValue = prevRoot === null ? NaN : Math.abs(((currentA + currentB) / 2 - prevRoot) / ((currentA + currentB) / 2));
+    return { root: c, iterations: maxIterations, relativeError: relativeErrorValue, error: "Maximum iterations reached." };
 }
 
-
-
+/**
+ * Finds the root of a function using the Newton-Raphson method.
+ * @param {function} func - The function for which to find the root.
+ * @param {function} funcDerivative - The derivative of the function.
+ * @param {number} initialGuess - The initial guess for the root.
+ * @param {number} tolerance - The desired tolerance for the root.
+ * @param {number} maxIterations - Maximum number of iterations allowed.
+ * @returns {{root: number|null, iterations: number, relativeError: number, error: string|null}} - Root, iterations, relative error, and error message (if any).
+ */
 function newtonRaphsonMethod(func, funcDerivative, initialGuess, tolerance, maxIterations) {
     let iteration = 0;
     let currentGuess = initialGuess;
     let prevGuess = null; // For relative error calculation
+    let relativeErrorValue = tolerance + 1; // Initialize relative error to be larger than tolerance
 
     while (iteration < maxIterations) {
         const fValue = func(currentGuess);
         const fDerivativeValue = funcDerivative(currentGuess);
 
+        // Check if derivative is zero (to prevent division by zero)
         if (fDerivativeValue === 0) {
-            return { root: null, iterations: iteration + 1, error: "Derivative is zero. Newton-Raphson method failed." };
+            return { root: null, iterations: iteration + 1, relativeError: NaN, error: "Derivative is zero. Newton-Raphson method failed." }; // Method fails if derivative is zero
         }
 
-        let relativeError = prevGuess !== null ? Math.abs((currentGuess - prevGuess) / (currentGuess || 1)) : 0; // Avoid division by zero
+        // Calculate relative error, handling the case of initialGuess being 0
+        relativeErrorValue = prevGuess === null ? tolerance + 1 : Math.abs((currentGuess - prevGuess) / currentGuess);
 
-        if (Math.abs(fValue) <= tolerance || (relativeError <= tolerance && prevGuess !== null)) { 
-            return { root: currentGuess, iterations: iteration + 1, relativeError };
+
+        // Check for convergence based on function value and relative error
+        if (Math.abs(fValue) <= tolerance || relativeErrorValue <= tolerance) {
+            return { root: currentGuess, iterations: iteration + 1, relativeError: relativeErrorValue, error: null }; // Root found
         }
 
-        prevGuess = currentGuess;
-        currentGuess = currentGuess - fValue / fDerivativeValue;
+        prevGuess = currentGuess; // Update previous guess for relative error calculation
+        currentGuess = currentGuess - fValue / fDerivativeValue; // Newton-Raphson iteration formula
         iteration++;
     }
 
-    return { 
-        root: currentGuess, 
-        iterations: maxIterations, 
-        error: "Maximum iterations reached.", 
-        relativeError: prevGuess !== null ? Math.abs((currentGuess - prevGuess) / (currentGuess || 1)) : 0 
-    };
-}
-
-function jacobiMethod(tolerance, maxIterations) {
-    let A = [
-        [3, 1, -1],
-        [2, -8, 1],
-        [-1, 1, 5]
-    ];
-    let B = [1, -2, 3];
-    let x = [0, 0, 0]; // Initial guess
-    let prevX = [...x]; // Store previous iteration values
-
-    let iterations = 0;
-    let relativeError = 1;
-
-    while (iterations < maxIterations && relativeError > tolerance) {
-        let newX = [...x];
-
-        for (let i = 0; i < A.length; i++) {
-            let sum = B[i];
-
-            for (let j = 0; j < A[i].length; j++) {
-                if (i !== j) {
-                    sum -= A[i][j] * prevX[j];
-                }
-            }
-
-            newX[i] = sum / A[i][i];
-        }
-
-        // Compute relative error
-        relativeError = Math.max(
-            ...newX.map((val, i) => Math.abs((val - prevX[i]) / (val || 1)))
-        );
-
-        prevX = [...newX];
-        iterations++;
-
-        if (relativeError < tolerance) break;
-    }
-
-    return { solution: prevX, iterations, relativeError };
-}
-
-function taylorSeriesApprox(x) {
-    const x0 = 0;
-    let y = 1; // Initial condition y(0) = 1
-    
-    // Compute derivatives at x0
-    const y1 = (y ** 2) + (x0 ** 2);
-    const y2 = 2 * y * y1 + 2 * x0;
-    const y3 = 2 * (y1 ** 2) + 2 * y * y2 + 2;
-    
-    // Taylor series expansion up to the third derivative
-    return y + y1 * x + (y2 * x ** 2) / 2 + (y3 * x ** 3) / 6;
+    // Max iterations reached, return with a possible error message and the last calculated relative error
+    return { root: currentGuess, iterations: maxIterations, relativeError: relativeErrorValue, error: "Maximum iterations reached." };
 }
 
 
-function f_x(x) {
-    return x ** 3;
-}
-
-function simpsons38Rule(a, b, n) {
-    const h = (b - a) / n;
-    let integralSum = f_x(a) + f_x(b);
-
-    for (let i = 1; i < n; i++) {
-        const x_i = a + i * h;
-        if (i % 3 === 0) {
-            integralSum += 2 * f_x(x_i);
-        } else {
-            integralSum += 3 * f_x(x_i);
-        }
-    }
-
-    return (3 * h / 8) * integralSum;
-}
-
-
-
-
-module.exports = { jacobiMethod };
-
-
-module.exports = { bisectionMethod, falsePositionMethod, newtonRaphsonMethod , jacobiMethod , taylorSeriesApprox , simpsons38Rule }; // ✅ CORRECT module.exports - exporting all three
+module.exports = { bisectionMethod, falsePositionMethod, newtonRaphsonMethod };

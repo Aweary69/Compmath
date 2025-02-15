@@ -3,7 +3,8 @@ const router = express.Router();
 const { iterativeMatrixInverse } = require("../taskfunc/matrixOperations");
 const { linearLeastSquaresFit } = require("../taskfunc/curveFitting");
 const { newtonsForwardDifference } = require("../taskfunc/firstDerivative");
-const { bisectionMethod, falsePositionMethod, newtonRaphsonMethod , jacobiMethod , taylorSeriesApprox , simpsons38Rule} = require("../taskfunc/rootFinding"); // ✅ Import all three root-finding methods
+const { bisectionMethod, falsePositionMethod, newtonRaphsonMethod } = require("../taskfunc/rootFinding");
+const { jacobiMethod } = require("../taskfunc/jacobiMethod"); // ✅ Import Jacobi Method
 
 // Matrix Inversion Route
 router.post("/inverse", (req, res) => {
@@ -86,48 +87,31 @@ router.post("/newton-raphson-root", (req, res) => {
     }
 });
 
+// Jacobi Method Route (Task 3)
 router.post("/jacobi-solve", (req, res) => {
     try {
-        const { tolerance, maxIterations } = req.body;
-        if (!tolerance || !maxIterations) {
-            return res.status(400).json({ error: "Missing input parameters" });
+        const { matrixA, vectorB, initialGuess, tolerance, maxIterations } = req.body;
+
+        // Convert inputs from strings to numbers
+        const A = matrixA.map(row => row.map(Number));
+        const b = vectorB.map(Number);
+        const x0 = initialGuess.map(Number);
+
+        // Input validation (basic)
+        if (!Array.isArray(A) || !Array.isArray(b) || !Array.isArray(x0) || A.length !== 3 || A[0].length !== 3 || b.length !== 3 || x0.length !== 3 || isNaN(tolerance) || isNaN(maxIterations)) {
+            return res.status(400).json({ error: "Invalid input format for Jacobi Method." });
         }
 
-        const result = jacobiMethod(parseFloat(tolerance), parseInt(maxIterations));
+        const result = jacobiMethod(A, b, x0, parseFloat(tolerance), parseInt(maxIterations));
 
         if (result.error) {
             return res.status(400).json({ error: result.error });
         }
-
-        res.json({ solution: result.solution, iterations: result.iterations, relativeError: result.relativeError });
-
+        // Format solution to 6 decimal places for display
+        res.json({ solution: result.solution.map(val => val.toFixed(6)), iterations: result.iterations });
     } catch (error) {
-        console.error("Jacobi Method Server Error:", error);
-        res.status(500).json({ error: "Server error during Jacobi Method computation" });
+        res.status(500).json({ error: "Server error during Jacobi Method: " + error.message });
     }
-});
-
-router.get('/taylor', (req, res) => {
-    const x = parseFloat(req.query.x);
-    
-    if (isNaN(x)) {
-        return res.status(400).json({ error: "Invalid input. Please provide a valid x value." });
-    }
-
-    const result = taylorSeriesApprox(x);
-    res.json({ x, y: result.toFixed(6) });
-});
-
-router.get('/simpsons38', (req, res) => {
-    const a = 2;
-    const b = 5;
-    const n = 6;
-
-    const approximateValue = simpsons38Rule(a, b, n);
-    const exactValue = 304.5; // Precomputed exact integral value
-    const absoluteError = Math.abs(exactValue - approximateValue);
-
-    res.json({ approximateValue, exactValue, absoluteError });
 });
 
 module.exports = router;
